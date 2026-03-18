@@ -69,14 +69,6 @@
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
       "deleteAppDataOnUninstall": false
-    },
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "rmcenlly",
-        "repo": "codespace-launcher",
-        "releaseType": "release"
-      }
-    ]
+    }
   }
 }

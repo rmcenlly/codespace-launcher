@@ -11,11 +11,21 @@ process.env.CSC_IDENTITY_AUTO_DISCOVERY = 'false'
 
 execSync('electron-vite build', { stdio: 'inherit', shell: true })
 
+const isPublish = process.env.PUBLISH === '1'
+
 const buildConfig = {
   targets: Platform.WINDOWS.createTarget(null, require('electron-builder').Arch.x64),
-  publish: process.env.PUBLISH === '1' ? 'always' : 'never',
+  publish: isPublish ? 'always' : 'never',
   config: {
     ...config,
+    ...(isPublish && {
+      publish: {
+        provider: 'github',
+        owner: 'rmcenlly',
+        repo: 'codespace-launcher',
+        releaseType: 'release'
+      }
+    }),
     win: {
       ...config.win,
       signAndEditExecutable: false
