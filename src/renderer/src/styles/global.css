@@ -1,0 +1,41 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #111111;
+  --surface: #1c1c1c;
+  --surface-hover: #262626;
+  --border: #2e2e2e;
+  --text: #d4d4d4;
+  --text-muted: #6b6b6b;
+  --accent: #89c48c;
+  --accent-hover: #a3d1a6;
+  --danger: #e06c75;
+  --danger-hover: #e8838b;
+  --radius: 10px;
+  --radius-sm: 6px;
+  font-size: 14px;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+input {
+  font-size: inherit;
+  font-family: inherit;
+}

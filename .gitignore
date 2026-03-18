@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+out/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Lock files
+package-lock.json
+
+# Environment
+.env
+.env.*
+.env.local
+
+# .NET build artifacts (contain absolute paths with local username)
+stub/obj/
+stub/bin/
+
+# electron-builder cache
+.electron-builder-cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+.claude/

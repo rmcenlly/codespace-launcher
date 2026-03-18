@@ -1,0 +1,157 @@
+.workspace-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.workspace-card:hover {
+  border-color: var(--accent);
+}
+
+/* ── Main row ─────────────────────────────── */
+.card-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.card-icon-wrap {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.card-icon-fallback {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: var(--border);
+}
+
+.card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-path {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Action buttons ───────────────────────── */
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.btn-launch {
+  background: var(--accent);
+  color: var(--bg);
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.btn-launch:hover { background: var(--accent-hover); }
+
+.btn-icon {
+  background: transparent;
+  color: var(--text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-icon:hover { background: var(--surface-hover); color: var(--text); }
+
+.btn-danger:hover { background: var(--surface-hover); color: var(--danger); }
+
+.btn-accordion {
+  transition: background 0.15s, color 0.15s, transform 0.2s;
+}
+.btn-accordion.open { transform: rotate(180deg); }
+
+/* ── Accordion children ───────────────────── */
+.card-children {
+  border-top: 1px solid var(--border);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg);
+}
+
+.child-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.child-card:hover { border-color: var(--accent); }
+
+.child-card .card-main {
+  padding: 10px 12px;
+}
+
+.child-card .card-info { flex: 1; min-width: 0; }
+
+.child-card .card-footer {
+  padding: 6px;
+}
+
+.child-card .card-children {
+  padding: 6px;
+}
+
+/* ── Footer ───────────────────────────────── */
+.card-footer {
+  border-top: 1px solid var(--border);
+  padding: 8px;
+}
+
+.btn-add-child {
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-add-child:hover { background: var(--surface-hover); color: var(--text); }

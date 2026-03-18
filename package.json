@@ -1,0 +1,82 @@
+{
+  "name": "codespace-launcher",
+  "version": "1.0.0",
+  "description": "A launcher for VSCode workspaces with custom taskbar icons",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "build:stub": "dotnet publish stub/stub.csproj -c Release -r win-x64 --self-contained false -o resources",
+    "package:win": "node scripts/package-win.js",
+    "package:release": "cross-env PUBLISH=1 node scripts/package-win.js"
+  },
+  "dependencies": {
+    "@electron-toolkit/utils": "^4.0.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "electron-updater": "^6.8.3",
+    "png-to-ico": "^3.0.1",
+    "rcedit": "^4.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.3.1",
+    "electron": "^33.3.1",
+    "electron-builder": "^26.8.1",
+    "electron-vite": "^3.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^6.0.6"
+  },
+  "build": {
+    "appId": "com.codespacelauncher",
+    "productName": "Codespace Launcher",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "files": [
+      "out/**",
+      "!out/**/*.map"
+    ],
+    "asarUnpack": [
+      "node_modules/@resvg/**"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/",
+        "to": ".",
+        "filter": [
+          "**/*",
+          "!*.pdb"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "rmcenlly",
+        "repo": "codespace-launcher",
+        "releaseType": "release"
+      }
+    ]
+  }
+}
