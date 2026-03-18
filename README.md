@@ -2,11 +2,17 @@
 
 A Windows desktop app for launching VS Code workspaces and folders with custom taskbar icons. Assign unique icons to each project, organise sub-projects as child workspaces, and launch everything with a single click — each workspace gets its own distinct entry in the taskbar.
 
+## Requirements
+
+- Windows 10 or later
+- [.NET 9 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) (required for custom taskbar icons)
+
 ## Installation
 
-1. Go to the [Releases](https://github.com/rmcenlly/codespace-launcher/releases/latest) page
-2. Download `Codespace Launcher Setup x.x.x.exe`
-3. Run the installer (Windows may show a SmartScreen warning — click **More info → Run anyway**)
+1. Install the [.NET 9 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) if you don't have it already
+2. Go to the [Releases](https://github.com/rmcenlly/codespace-launcher/releases/latest) page
+3. Download `Codespace Launcher Setup x.x.x.exe`
+4. Run the installer (Windows may show a SmartScreen warning — click **More info → Run anyway**)
 
 ## Adding a Workspace
 
