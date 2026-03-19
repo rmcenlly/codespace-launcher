@@ -18,14 +18,12 @@ const buildConfig = {
   publish: isPublish ? 'always' : 'never',
   config: {
     ...config,
-    ...(isPublish && {
-      publish: {
-        provider: 'github',
-        owner: 'rmcenlly',
-        repo: 'codespace-launcher',
-        releaseType: 'release'
-      }
-    }),
+    publish: {
+      provider: 'github',
+      owner: 'rmcenlly',
+      repo: 'codespace-launcher',
+      releaseType: 'release'
+    },
     win: {
       ...config.win,
       signAndEditExecutable: false
