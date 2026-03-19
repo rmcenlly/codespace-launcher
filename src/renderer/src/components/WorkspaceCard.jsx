@@ -2,6 +2,18 @@ import { useState, useEffect } from 'react'
 import '../styles/WorkspaceCard.css'
 import workspaceIconSvgTemplate from '../assets/workspace-icon.svg?raw'
 
+function displayPath(path, excludedPaths) {
+  if (!excludedPaths?.length) return path
+  const normPath = path.replace(/\\/g, '/').toLowerCase()
+  for (const excluded of excludedPaths) {
+    const normExcluded = excluded.replace(/\\/g, '/').replace(/\/$/, '').toLowerCase()
+    if (normPath.startsWith(normExcluded + '/')) {
+      return path.slice(normExcluded.length + 1)
+    }
+  }
+  return path
+}
+
 function hueFromIndex(index) {
   const group = Math.floor(index / 3)
   const member = index % 3
@@ -35,9 +47,16 @@ function WorkspaceIcon({ workspace }) {
   return <img src={makeFallbackUrl(workspace.colorIndex ?? 0)} alt="" className="card-icon" />
 }
 
-function ChildCard({ child, rootWorkspace, onLaunch, onAddChild, onEdit, onDelete }) {
+function ChildCard({ child, rootWorkspace, excludedPaths, onLaunch, onAddChild, onEdit, onDelete }) {
   const [accordionOpen, setAccordionOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
   const hasChildren = child.children && child.children.length > 0
+
+  function copyPath() {
+    navigator.clipboard.writeText(child.path)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
 
   function handleAddChild() {
     if (hasChildren && !accordionOpen) setAccordionOpen(true)
@@ -49,7 +68,12 @@ function ChildCard({ child, rootWorkspace, onLaunch, onAddChild, onEdit, onDelet
       <div className="card-main">
         <div className="card-info">
           <span className="card-name">{child.name}</span>
-          <span className="card-path">{child.path}</span>
+          <div className="card-path-wrap">
+            <span className="card-path" onClick={copyPath} title={child.path}>
+              {displayPath(child.path, excludedPaths)}
+            </span>
+            {copied && <span className="card-path-copied">Path Copied</span>}
+          </div>
         </div>
         <div className="card-actions">
           <button className="btn-launch" onClick={() => onLaunch(child, rootWorkspace)} title="Open in VSCode">
@@ -80,6 +104,7 @@ function ChildCard({ child, rootWorkspace, onLaunch, onAddChild, onEdit, onDelet
               key={grandchild.id}
               child={grandchild}
               rootWorkspace={rootWorkspace}
+              excludedPaths={excludedPaths}
               onLaunch={onLaunch}
               onAddChild={onAddChild}
               onEdit={onEdit}
@@ -98,9 +123,16 @@ function ChildCard({ child, rootWorkspace, onLaunch, onAddChild, onEdit, onDelet
   )
 }
 
-export default function WorkspaceCard({ workspace, onLaunch, onAddChild, onEdit, onDelete }) {
+export default function WorkspaceCard({ workspace, excludedPaths, onLaunch, onAddChild, onEdit, onDelete }) {
   const [accordionOpen, setAccordionOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
   const hasChildren = workspace.children && workspace.children.length > 0
+
+  function copyPath() {
+    navigator.clipboard.writeText(workspace.path)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
 
   function handleAddChild() {
     if (hasChildren && !accordionOpen) setAccordionOpen(true)
@@ -116,7 +148,12 @@ export default function WorkspaceCard({ workspace, onLaunch, onAddChild, onEdit,
 
         <div className="card-info">
           <span className="card-name">{workspace.name}</span>
-          <span className="card-path">{workspace.path}</span>
+          <div className="card-path-wrap">
+            <span className="card-path" onClick={copyPath} title={workspace.path}>
+              {displayPath(workspace.path, excludedPaths)}
+            </span>
+            {copied && <span className="card-path-copied">Path Copied</span>}
+          </div>
         </div>
 
         <div className="card-actions">
@@ -150,6 +187,7 @@ export default function WorkspaceCard({ workspace, onLaunch, onAddChild, onEdit,
                 key={child.id}
                 child={child}
                 rootWorkspace={workspace}
+                excludedPaths={excludedPaths}
                 onLaunch={onLaunch}
                 onAddChild={onAddChild}
                 onEdit={onEdit}

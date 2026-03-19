@@ -19,6 +19,13 @@
   color: var(--text);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 .app-main {
   flex: 1;
   overflow-y: auto;

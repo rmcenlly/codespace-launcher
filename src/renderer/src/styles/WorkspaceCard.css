@@ -53,12 +53,40 @@
   text-overflow: ellipsis;
 }
 
+.card-path-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .card-path {
   font-size: 11px;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.card-path:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+@keyframes path-copied-fade {
+  0%   { opacity: 1; }
+  60%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.card-path-copied {
+  font-size: 10px;
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+  animation: path-copied-fade 1.5s ease forwards;
+  pointer-events: none;
 }
 
 /* ── Action buttons ───────────────────────── */

@@ -3,13 +3,16 @@ import WorkspaceGrid from './components/WorkspaceGrid'
 import WorkspaceForm from './components/WorkspaceForm'
 import ConfirmDialog from './components/ConfirmDialog'
 import UpdateBanner from './components/UpdateBanner'
+import SettingsDialog from './components/SettingsDialog'
 import './styles/App.css'
+import './styles/SettingsDialog.css'
 
 export default function App() {
   const [settings, setSettings] = useState({ workspaces: [] })
   const [formState, setFormState] = useState(null) // null | { mode: 'add' | 'edit', parentId?: string, workspace?: object }
   const [confirmState, setConfirmState] = useState(null) // null | { id: string, name: string }
   const [updateState, setUpdateState] = useState(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   useEffect(() => {
     window.api.settings.read().then(setSettings)
@@ -36,6 +39,11 @@ export default function App() {
     // Re-read so the main process can assign/clear colorIndex based on resolved icons
     const refreshed = await window.api.settings.read()
     setSettings(refreshed)
+  }
+
+  async function handleSettingsSave(updated) {
+    await saveSettings(updated)
+    setSettingsOpen(false)
   }
 
   function addChildTo(nodes, parentId, child) {
@@ -130,9 +138,14 @@ export default function App() {
             onDismiss={() => setUpdateState(null)}
           />
         )}
-        <button className="btn-primary" onClick={() => openAddForm()}>
-          + Add Workspace
-        </button>
+        <div className="header-actions">
+          <button className="btn-cog" onClick={() => setSettingsOpen(true)} title="Settings">
+            ⚙
+          </button>
+          <button className="btn-primary" onClick={() => openAddForm()}>
+            + Add Workspace
+          </button>
+        </div>
       </header>
 
       <main className="app-main">
@@ -146,6 +159,7 @@ export default function App() {
         ) : (
           <WorkspaceGrid
             workspaces={[...settings.workspaces].sort((a, b) => a.name.localeCompare(b.name))}
+            excludedPaths={settings.excludedPaths ?? []}
             onLaunch={(ws, parent) => window.api.workspace.launch(ws, parent ?? null)}
             onAddChild={(parentId) => openAddForm(parentId)}
             onEdit={(ws, parentId) => openEditForm(ws, parentId)}
@@ -169,6 +183,14 @@ export default function App() {
           message={`Are you sure you want to remove launcher for "${confirmState.name}"?`}
           onConfirm={confirmDelete}
           onCancel={() => setConfirmState(null)}
+        />
+      )}
+
+      {settingsOpen && (
+        <SettingsDialog
+          settings={settings}
+          onSave={handleSettingsSave}
+          onCancel={() => setSettingsOpen(false)}
         />
       )}
     </div>
