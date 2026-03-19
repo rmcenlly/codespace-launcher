@@ -32,9 +32,13 @@ const buildConfig = {
     },
     afterPack: async (context) => {
       const rcedit = require('rcedit')
+      const { copyFileSync } = require('fs')
       const exePath = path.join(context.appOutDir, 'Codespace Launcher.exe')
       const iconPath = path.join(__dirname, '..', 'build', 'icon.ico')
       await rcedit(exePath, { icon: iconPath })
+      // Copy icon into resources after rcedit has finished with it,
+      // so the tray can load it at runtime via process.resourcesPath
+      copyFileSync(iconPath, path.join(context.appOutDir, 'resources', 'icon.ico'))
     }
   }
 }

@@ -14,6 +14,16 @@ A Windows desktop app for launching VS Code workspaces and folders with custom t
 3. Download `Codespace Launcher Setup x.x.x.exe`
 4. Run the installer (Windows may show a SmartScreen warning — click **More info → Run anyway**)
 
+## System Tray
+
+Codespace Launcher runs as a tray application. After installation it starts automatically with Windows and sits in the system tray — no window appears until you need it.
+
+- **Open the window** — click the tray icon
+- **Hide the window** — click the tray icon again, or click the **✕** button
+- **Quit entirely** — right-click the tray icon and select **Quit**
+
+The app can be disabled from starting with Windows at any time via **Task Manager → Startup Apps**.
+
 ## Adding a Workspace
 
 1. Click **+ Add Workspace** in the top-right corner

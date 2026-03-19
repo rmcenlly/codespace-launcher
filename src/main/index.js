@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, shell, BrowserWindow, Tray, Menu, ipcMain, dialog } from 'electron'
 import { join, extname, dirname } from 'path'
 import { initUpdater } from './updater'
 import { readFileSync } from 'fs'
@@ -6,8 +6,16 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { readSettings, writeSettings } from './settings'
 import { launchWorkspace, resolveDisplayIcon } from './stub-manager'
 
+const iconPath = is.dev
+  ? join(__dirname, '../../build/icon.ico')
+  : join(process.resourcesPath, 'icon.ico')
+
+let mainWindow = null
+let tray = null
+let quitting = false
+
 function createWindow() {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1000,
     height: 700,
     minWidth: 600,
@@ -20,7 +28,13 @@ function createWindow() {
     }
   })
 
-  mainWindow.on('ready-to-show', () => mainWindow.show())
+  // Hide to tray on close instead of destroying
+  mainWindow.on('close', (e) => {
+    if (!quitting) {
+      e.preventDefault()
+      mainWindow.hide()
+    }
+  })
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
@@ -32,6 +46,40 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+}
+
+function createTray() {
+  tray = new Tray(iconPath)
+  tray.setToolTip('Codespace Launcher')
+
+  const menu = Menu.buildFromTemplate([
+    {
+      label: 'Show',
+      click: () => {
+        mainWindow.show()
+        mainWindow.focus()
+      }
+    },
+    { type: 'separator' },
+    {
+      label: 'Quit',
+      click: () => {
+        quitting = true
+        app.quit()
+      }
+    }
+  ])
+
+  tray.setContextMenu(menu)
+
+  tray.on('click', () => {
+    if (mainWindow.isVisible()) {
+      mainWindow.hide()
+    } else {
+      mainWindow.show()
+      mainWindow.focus()
+    }
+  })
 }
 
 app.whenReady().then(() => {
@@ -134,13 +182,9 @@ app.whenReady().then(() => {
   })
 
   createWindow()
+  createTray()
   if (!is.dev) initUpdater(mainWindow)
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
 })
 
-app.on('window-all-closed', () => {
-  app.quit()
-})
+// Keep the app alive when the window is closed — tray keeps it running
+app.on('window-all-closed', () => {})

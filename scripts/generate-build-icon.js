@@ -13,9 +13,12 @@ async function main() {
   const template = readFileSync(join(__dirname, '../resources/workspace-icon.svg'), 'utf-8')
   const svg = template.replaceAll('{{HUE}}', String(hue))
 
-  const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: 256 } })
-  const pngBuffer = resvg.render().asPng()
-  const icoBuffer = await pngToIco([pngBuffer])
+  const sizes = [16, 32, 48, 256]
+  const pngBuffers = sizes.map((size) => {
+    const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: size } })
+    return resvg.render().asPng()
+  })
+  const icoBuffer = await pngToIco(pngBuffers)
 
   mkdirSync(join(__dirname, '../build'), { recursive: true })
   writeFileSync(join(__dirname, '../build/icon.ico'), icoBuffer)
