@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron'
 import { autoUpdater } from 'electron-updater'
+import { setShowOnStart } from './settings'
 
 export function initUpdater(mainWindow) {
   autoUpdater.autoDownload = false
@@ -28,11 +29,12 @@ export function initUpdater(mainWindow) {
   })
 
   ipcMain.handle('updater:start-download', () => autoUpdater.downloadUpdate())
-  ipcMain.handle('updater:quit-and-install', () =>
-    // isSilent=false: NSIS shows its UI (needed without code signing for SmartScreen)
+  ipcMain.handle('updater:quit-and-install', () => {
+    // isSilent=true: skip NSIS UI on update (settings are preserved in %APPDATA%)
     // isForceRunAfter=true: app relaunches after install
-    autoUpdater.quitAndInstall(false, true)
-  )
+    setShowOnStart()
+    autoUpdater.quitAndInstall(true, true)
+  })
 
   // Check ~3s after launch so the window is settled
   setTimeout(() => autoUpdater.checkForUpdates().catch(() => {}), 3000)

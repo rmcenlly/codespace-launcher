@@ -1,9 +1,10 @@
 import { app } from 'electron'
 import { join } from 'path'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, unlinkSync } from 'fs'
 
 const DATA_DIR = join(app.getPath('appData'), 'CodespaceLauncher')
 const SETTINGS_FILE = join(DATA_DIR, 'settings.json')
+const SHOW_ON_START_FILE = join(DATA_DIR, '.show-on-start')
 const ICONS_DIR = join(DATA_DIR, 'icons')
 const STUBS_DIR = join(DATA_DIR, 'stubs')
 
@@ -38,4 +39,17 @@ export function getStubsDir() {
 export function getIconsDir() {
   ensureDataDirs()
   return ICONS_DIR
+}
+
+export function setShowOnStart() {
+  ensureDataDirs()
+  writeFileSync(SHOW_ON_START_FILE, '', 'utf-8')
+}
+
+export function checkAndClearShowOnStart() {
+  if (existsSync(SHOW_ON_START_FILE)) {
+    try { unlinkSync(SHOW_ON_START_FILE) } catch {}
+    return true
+  }
+  return false
 }

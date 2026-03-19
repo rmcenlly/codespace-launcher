@@ -3,7 +3,7 @@ import { join, extname, dirname } from 'path'
 import { initUpdater } from './updater'
 import { readFileSync } from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { readSettings, writeSettings } from './settings'
+import { readSettings, writeSettings, checkAndClearShowOnStart } from './settings'
 import { launchWorkspace, resolveDisplayIcon } from './stub-manager'
 
 const iconPath = is.dev
@@ -184,6 +184,14 @@ app.whenReady().then(() => {
   createWindow()
   createTray()
   if (!is.dev) initUpdater(mainWindow)
+
+  // After an update-triggered restart, show the window automatically
+  if (checkAndClearShowOnStart()) {
+    mainWindow.once('ready-to-show', () => {
+      mainWindow.show()
+      mainWindow.focus()
+    })
+  }
 })
 
 // Keep the app alive when the window is closed — tray keeps it running
