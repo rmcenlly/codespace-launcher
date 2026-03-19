@@ -141,19 +141,23 @@ export default function WorkspaceCard({ workspace, onLaunch, onAddChild, onEdit,
         </div>
       </div>
 
-      {hasChildren && accordionOpen && (
-        <div className="card-children">
-          {workspace.children.map((child) => (
-            <ChildCard
-              key={child.id}
-              child={child}
-              rootWorkspace={workspace}
-              onLaunch={onLaunch}
-              onAddChild={onAddChild}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))}
+      {hasChildren && (
+        <div className={`card-children-wrap ${accordionOpen ? 'open' : ''}`}>
+          <div className="card-children">
+            <div className="card-children-inner">
+            {workspace.children.map((child) => (
+              <ChildCard
+                key={child.id}
+                child={child}
+                rootWorkspace={workspace}
+                onLaunch={onLaunch}
+                onAddChild={onAddChild}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            ))}
+            </div>
+          </div>
         </div>
       )}
 

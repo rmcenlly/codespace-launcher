@@ -80,6 +80,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-left: 2px;
+  margin-right: 6px;
   transition: background 0.15s;
 }
 .btn-launch:hover { background: var(--accent-hover); }
@@ -101,12 +103,24 @@
 .btn-danger:hover { background: var(--surface-hover); color: var(--danger); }
 
 .btn-accordion {
+  font-size: 18px;
   transition: background 0.15s, color 0.15s, transform 0.2s;
 }
 .btn-accordion.open { transform: rotate(180deg); }
 
 /* ── Accordion children ───────────────────── */
+.card-children-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+}
+.card-children-wrap.open {
+  grid-template-rows: 1fr;
+}
 .card-children {
+  overflow: hidden;
+}
+.card-children-inner {
   border-top: 1px solid var(--border);
   padding: 8px;
   display: flex;
