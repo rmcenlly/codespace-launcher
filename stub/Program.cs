@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -73,9 +74,10 @@ static class Program
         pid   = 5
     };
 
-    const uint WM_SETICON     = 0x0080;
-    const uint IMAGE_ICON     = 1;
+    const uint WM_SETICON      = 0x0080;
+    const uint IMAGE_ICON      = 1;
     const uint LR_LOADFROMFILE = 0x0010;
+    const uint LR_DEFAULTSIZE  = 0x0040;
 
     // ── Entry point ───────────────────────────────────────────────────────
 
@@ -93,20 +95,31 @@ static class Program
         if (string.IsNullOrEmpty(Path.GetExtension(workspace.TrimEnd('\\', '/'))))
             workspaceKey = new DirectoryInfo(workspace.TrimEnd('\\', '/')).Name;
 
+        // Snapshot existing VSCode windows before launching so we can identify the NEW one.
+        // This prevents the stub from stamping an already-open window whose title happens
+        // to contain the workspace key as a substring.
+        var existingWindows = new HashSet<IntPtr>();
+        EnumWindows((h, _) =>
+        {
+            if (IsWindowVisible(h) && IsVSCodeWindow(h, workspaceKey))
+                existingWindows.Add(h);
+            return true;
+        }, IntPtr.Zero);
+
         LaunchVSCode(workspace);
 
-        // Wait up to 30s for the VSCode window to appear
+        // Wait up to 30s for a NEW VSCode window with the workspace name to appear.
         IntPtr hwnd = IntPtr.Zero;
         for (int i = 0; i < 300 && hwnd == IntPtr.Zero; i++)
         {
             Thread.Sleep(100);
-            hwnd = FindVSCodeWindow(workspaceKey);
+            hwnd = FindVSCodeWindow(workspaceKey, existingWindows);
         }
 
         if (hwnd == IntPtr.Zero) return;
 
         // Give VSCode a moment to fully initialise before we touch its properties
-        Thread.Sleep(500);
+        Thread.Sleep(1000);
 
         // 1. Set unique AppUserModelID on the VSCode window.
         //    This separates it from other VSCode instances in the taskbar.
@@ -114,15 +127,25 @@ static class Program
 
         // 2. Replace the window icon so the taskbar button shows our custom icon.
         //    HICON is a USER object — valid across processes.
+        //    Apply multiple times to survive VSCode resetting its icon during workspace load.
+        IntPtr hIcon = IntPtr.Zero;
         if (!string.IsNullOrEmpty(iconPath) && File.Exists(iconPath))
+            hIcon = LoadImage(IntPtr.Zero, iconPath, IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
+
+        void StampIcon()
         {
-            IntPtr hIcon = LoadImage(IntPtr.Zero, iconPath, IMAGE_ICON, 0, 0, LR_LOADFROMFILE);
             if (hIcon != IntPtr.Zero)
             {
                 SendMessage(hwnd, WM_SETICON, (IntPtr)1, hIcon); // ICON_BIG
                 SendMessage(hwnd, WM_SETICON, (IntPtr)0, hIcon); // ICON_SMALL
             }
         }
+
+        StampIcon();
+
+        // Re-stamp after short delays to survive VSCode's own post-load icon resets
+        Thread.Sleep(1500); StampIcon();
+        Thread.Sleep(3000); StampIcon();
 
         // 3. Stay alive (holding the HICON in memory) until the window closes
         while (IsWindow(hwnd))
@@ -163,22 +186,27 @@ static class Program
         catch { }
     }
 
-    static IntPtr FindVSCodeWindow(string key)
+    static bool IsVSCodeWindow(IntPtr hwnd, string key)
+    {
+        int len = GetWindowTextLength(hwnd);
+        if (len == 0) return false;
+        var sb = new StringBuilder(len + 1);
+        GetWindowText(hwnd, sb, sb.Capacity);
+        var title = sb.ToString();
+        if (!title.Contains("Visual Studio Code", StringComparison.OrdinalIgnoreCase)) return false;
+        if (!string.IsNullOrEmpty(key) &&
+            !title.Contains(key, StringComparison.OrdinalIgnoreCase)) return false;
+        return true;
+    }
+
+    static IntPtr FindVSCodeWindow(string key, HashSet<IntPtr> exclude = null)
     {
         IntPtr found = IntPtr.Zero;
         EnumWindows((hwnd, _) =>
         {
             if (!IsWindowVisible(hwnd)) return true;
-            int len = GetWindowTextLength(hwnd);
-            if (len == 0) return true;
-            var sb = new StringBuilder(len + 1);
-            GetWindowText(hwnd, sb, sb.Capacity);
-            var title = sb.ToString();
-
-            if (!title.Contains("Visual Studio Code", StringComparison.OrdinalIgnoreCase)) return true;
-            if (!string.IsNullOrEmpty(key) &&
-                !title.Contains(key, StringComparison.OrdinalIgnoreCase)) return true;
-
+            if (exclude != null && exclude.Contains(hwnd)) return true;
+            if (!IsVSCodeWindow(hwnd, key)) return true;
             found = hwnd;
             return false;
         }, IntPtr.Zero);

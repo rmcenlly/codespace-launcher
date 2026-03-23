@@ -1,6 +1,4 @@
 .workspace-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
-  align-items: start;
+  columns: auto 320px;
+  column-gap: 16px;
 }

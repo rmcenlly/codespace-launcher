@@ -20,7 +20,10 @@ const DISPLAY_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico']
 const STAMP_EXTENSIONS = ['.ico']
 
 function resolveIconWithExtensions(workspace, extensions) {
-  if (workspace.icon && existsSync(workspace.icon)) return workspace.icon
+  if (workspace.icon && existsSync(workspace.icon) &&
+      extensions.includes(extname(workspace.icon).toLowerCase())) {
+    return workspace.icon
+  }
 
   const workspacePath = workspace.path
   const isFile = workspacePath.endsWith('.code-workspace')

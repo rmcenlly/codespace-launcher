@@ -4,6 +4,8 @@
   border-radius: var(--radius);
   overflow: hidden;
   transition: border-color 0.15s;
+  break-inside: avoid;
+  margin-bottom: 16px;
 }
 
 .workspace-card:hover {
