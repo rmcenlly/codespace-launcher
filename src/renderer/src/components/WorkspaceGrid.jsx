@@ -1,7 +1,7 @@
 import WorkspaceCard from './WorkspaceCard'
 import '../styles/WorkspaceGrid.css'
 
-export default function WorkspaceGrid({ workspaces, excludedPaths, onLaunch, onAddChild, onEdit, onDelete }) {
+export default function WorkspaceGrid({ workspaces, excludedPaths, onLaunch, onAddChild, onEdit, onDelete, selectedIds, onSelect }) {
   return (
     <div className="workspace-grid">
       {workspaces.map((ws) => (
@@ -14,6 +14,8 @@ export default function WorkspaceGrid({ workspaces, excludedPaths, onLaunch, onA
           onAddChild={onAddChild}
           onEdit={onEdit}
           onDelete={onDelete}
+          selected={selectedIds?.has(ws.id) ?? false}
+          onSelect={onSelect}
         />
       ))}
     </div>

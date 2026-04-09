@@ -12,6 +12,11 @@
   border-color: var(--accent);
 }
 
+.workspace-card.selected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 5%, var(--surface));
+}
+
 /* ── Main row ─────────────────────────────── */
 .card-main {
   display: flex;

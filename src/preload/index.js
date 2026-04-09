@@ -6,7 +6,9 @@ contextBridge.exposeInMainWorld('api', {
     write: (settings) => ipcRenderer.invoke('settings:write', settings)
   },
   dialog: {
-    openPath: (options) => ipcRenderer.invoke('dialog:openPath', options)
+    openPath: (options) => ipcRenderer.invoke('dialog:openPath', options),
+    showOpenDialog: (options) => ipcRenderer.invoke('dialog:showOpenDialog', options),
+    showOpenDialogSync: (options) => ipcRenderer.invoke('dialog:showOpenDialogSync', options)
   },
   workspace: {
     resolveIcon: (workspace) => ipcRenderer.invoke('workspace:resolveIcon', workspace),

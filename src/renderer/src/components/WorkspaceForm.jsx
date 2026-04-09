@@ -20,10 +20,24 @@ export default function WorkspaceForm({ mode, isChild, initial, onSave, onCancel
   }
 
   async function browseFolder() {
-    const result = await window.api.dialog.openPath({ folder: true })
-    if (!result) return
-    setPath(result)
-    if (!nameTouched) setName(deriveName(result))
+    const { canceled, filePaths } = await window.api.dialog.showOpenDialog({
+      properties: ['openDirectory', 'multiSelections']
+    })
+    if (canceled) return
+    if (filePaths.length > 1) {
+      onSave(filePaths.map((p) => ({
+        id: slugify(deriveName(p)),
+        name: deriveName(p),
+        path: p,
+        type: 'folder',
+        icon: null,
+        children: []
+      })))
+      return
+    }
+    const p = filePaths[0]
+    setPath(p)
+    if (!nameTouched) setName(deriveName(p))
   }
 
   async function browseWorkspaceFile() {

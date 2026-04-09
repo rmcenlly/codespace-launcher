@@ -123,7 +123,7 @@ function ChildCard({ child, rootWorkspace, excludedPaths, onLaunch, onAddChild, 
   )
 }
 
-export default function WorkspaceCard({ workspace, excludedPaths, onLaunch, onAddChild, onEdit, onDelete }) {
+export default function WorkspaceCard({ workspace, excludedPaths, onLaunch, onAddChild, onEdit, onDelete, selected, onSelect }) {
   const [accordionOpen, setAccordionOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const hasChildren = workspace.children && workspace.children.length > 0
@@ -139,8 +139,13 @@ export default function WorkspaceCard({ workspace, excludedPaths, onLaunch, onAd
     onAddChild(workspace.id)
   }
 
+  function handleCardClick(e) {
+    if (e.target.closest('button, a, input, .card-path')) return
+    onSelect?.(workspace.id)
+  }
+
   return (
-    <div className="workspace-card">
+    <div className={`workspace-card${selected ? ' selected' : ''}`} onClick={handleCardClick}>
       <div className="card-main">
         <div className="card-icon-wrap">
           <WorkspaceIcon workspace={workspace} />

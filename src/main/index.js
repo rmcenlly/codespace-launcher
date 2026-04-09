@@ -140,7 +140,12 @@ app.whenReady().then(() => {
     const dialogOptions = {
       properties: isFolder ? ['openDirectory'] : ['openFile']
     }
-    if (lastBrowseDir) dialogOptions.defaultPath = lastBrowseDir
+    const currentSettings = readSettings()
+    if (currentSettings.defaultDirectory) {
+      dialogOptions.defaultPath = currentSettings.defaultDirectory
+    } else if (lastBrowseDir) {
+      dialogOptions.defaultPath = lastBrowseDir
+    }
     if (!isFolder) {
       dialogOptions.filters = isImage
         ? [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'ico', 'svg', 'webp'] }]
@@ -155,6 +160,25 @@ app.whenReady().then(() => {
       return selected
     }
     return null
+  })
+
+  // IPC: raw showOpenDialog passthrough
+  ipcMain.handle('dialog:showOpenDialog', (_, options) => {
+    const merged = { ...options }
+    if (!merged.defaultPath) {
+      const currentSettings = readSettings()
+      if (currentSettings.defaultDirectory) {
+        merged.defaultPath = currentSettings.defaultDirectory
+      } else if (lastBrowseDir) {
+        merged.defaultPath = lastBrowseDir
+      }
+    }
+    return dialog.showOpenDialog(merged)
+  })
+
+  // IPC: raw showOpenDialog passthrough
+  ipcMain.handle('dialog:showOpenDialogSync', (_, options) => {
+    return dialog.showOpenDialogSync(options)
   })
 
   // IPC: load a display icon as a base64 data URL (PNG preferred over ICO).
@@ -178,7 +202,9 @@ app.whenReady().then(() => {
 
   // IPC: launch workspace
   ipcMain.handle('workspace:launch', (_, workspace, parentWorkspace) => {
-    return launchWorkspace(workspace, parentWorkspace)
+    const result = launchWorkspace(workspace, parentWorkspace)
+    if (readSettings().closeLauncherOnOpen) mainWindow.hide()
+    return result
   })
 
   createWindow()

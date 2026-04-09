@@ -13,6 +13,7 @@ export default function App() {
   const [confirmState, setConfirmState] = useState(null) // null | { id: string, name: string }
   const [updateState, setUpdateState] = useState(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [selectedIds, setSelectedIds] = useState(new Set())
 
   useEffect(() => {
     window.api.settings.read().then(setSettings)
@@ -70,6 +71,22 @@ export default function App() {
       )
   }
 
+  function handleSelect(id) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  async function handleOpenSelected() {
+    for (const id of selectedIds) {
+      const ws = findNode(settings.workspaces, id)
+      if (ws) window.api.workspace.launch(ws, null)
+    }
+    setSelectedIds(new Set())
+  }
+
   function openAddForm(parentId = null) {
     setFormState({ mode: 'add', parentId })
   }
@@ -83,19 +100,22 @@ export default function App() {
   }
 
   async function handleFormSave(data) {
-    const updated = { ...settings }
+    const items = Array.isArray(data) ? data : [data]
+    let updated = { ...settings }
 
-    if (formState.parentId) {
-      if (formState.mode === 'add') {
-        updated.workspaces = addChildTo(updated.workspaces, formState.parentId, data)
+    for (const item of items) {
+      if (formState.parentId) {
+        if (formState.mode === 'add') {
+          updated.workspaces = addChildTo(updated.workspaces, formState.parentId, item)
+        } else {
+          updated.workspaces = updateNode(updated.workspaces, item.id, item)
+        }
       } else {
-        updated.workspaces = updateNode(updated.workspaces, data.id, data)
-      }
-    } else {
-      if (formState.mode === 'add') {
-        updated.workspaces = [...updated.workspaces, data]
-      } else {
-        updated.workspaces = updateNode(updated.workspaces, data.id, data)
+        if (formState.mode === 'add') {
+          updated.workspaces = [...updated.workspaces, item]
+        } else {
+          updated.workspaces = updateNode(updated.workspaces, item.id, item)
+        }
       }
     }
 
@@ -139,6 +159,11 @@ export default function App() {
           />
         )}
         <div className="header-actions">
+          {selectedIds.size > 0 && (
+            <button className="btn-outline" onClick={handleOpenSelected}>
+              Open Selected ({selectedIds.size})
+            </button>
+          )}
           <button className="btn-cog" onClick={() => setSettingsOpen(true)} title="Settings">
             ⚙
           </button>
@@ -164,6 +189,8 @@ export default function App() {
             onAddChild={(parentId) => openAddForm(parentId)}
             onEdit={(ws, parentId) => openEditForm(ws, parentId)}
             onDelete={handleDelete}
+            selectedIds={selectedIds}
+            onSelect={handleSelect}
           />
         )}
       </main>
