@@ -1,6 +1,6 @@
 {
   "name": "codespace-launcher",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A launcher for VSCode workspaces with custom taskbar icons",
   "main": "./out/main/index.js",
   "scripts": {
