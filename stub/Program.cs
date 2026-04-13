@@ -194,8 +194,16 @@ static class Program
         GetWindowText(hwnd, sb, sb.Capacity);
         var title = sb.ToString();
         if (!title.Contains("Visual Studio Code", StringComparison.OrdinalIgnoreCase)) return false;
-        if (!string.IsNullOrEmpty(key) &&
-            !title.Contains(key, StringComparison.OrdinalIgnoreCase)) return false;
+        if (!string.IsNullOrEmpty(key))
+        {
+            // Require the key to be followed by a space — prevents "Framework" from
+            // matching "Framework-Testing" via plain substring overlap.
+            // VSCode titles: "FolderName - VS Code" or "file.ts - FolderName - VS Code"
+            bool keyMatch =
+                title.StartsWith(key + " ", StringComparison.OrdinalIgnoreCase) ||
+                title.Contains(" " + key + " ", StringComparison.OrdinalIgnoreCase);
+            if (!keyMatch) return false;
+        }
         return true;
     }
 

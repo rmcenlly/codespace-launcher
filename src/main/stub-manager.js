@@ -122,10 +122,14 @@ export async function launchWorkspace(workspace, parentWorkspace = null) {
 
   // Copy shared .NET files alongside — the exe bootstrap hardcodes 'stub.dll'
   // so these filenames must stay as-is. Multiple workspace exes share them.
-  // Skip files that already exist — copying a loaded DLL causes EBUSY.
+  // Always try to update; ignore EBUSY if a running stub has the DLL locked.
   for (const file of STUB_FILES.filter((f) => f !== 'stub.exe')) {
     const dest = join(stubsDir, file)
-    if (!existsSync(dest)) copyFileSync(join(STUB_DIR, file), dest)
+    try {
+      copyFileSync(join(STUB_DIR, file), dest)
+    } catch (e) {
+      if (!existsSync(dest)) throw e // file must exist for the stub to run
+    }
   }
 
   // All stubs share the same exe — no per-workspace exe needed anymore since
